@@ -12,7 +12,11 @@
 
 int _write(int file, char *ptr, int len);
 
+#ifdef DEBUG
 #define DEBUG_PRINT(...) do {printf(__VA_ARGS__); printf("\n");} while (0)
+#else
+#define DEBUG_PRINT(...)
+#endif
 
 
 
