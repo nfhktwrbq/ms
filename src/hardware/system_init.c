@@ -92,6 +92,7 @@ void system_init(void)
 #ifdef DEBUG
     debug_init();
 #endif
+    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
 
     interrupts_init();
     s_system_clock_init();

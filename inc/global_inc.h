@@ -14,5 +14,8 @@
 
 #include "global_def.h"
 #include "mcu.h"
+#include "debug.h"
+
+#include "cmsis_os.h"
 
 #endif /* INC_GLOBAL_INC_H_ */
