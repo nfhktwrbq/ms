@@ -20,6 +20,7 @@
 #define DECODE_MODE_CODE_B_FOR_0    (0x01)
 #define DECODE_MODE_CODE_B_FOR_3_0  (0x0f)
 #define DECODE_MODE_CODE_B_FOR_7_0  (0xff)
+#define COMMAND_LEN                 (2)
 
 static uint32_t _display_buffer[8];
 
@@ -71,6 +72,7 @@ void display_init(void)
 
     if (d_descr)
     {
+        d_descr->part_len = CONTINUOUS_DATA_LEN;
         _display_add_command(d_descr, DECODE_MODE_REG, DECODE_MODE_NO_DECODE, &data_pos);
         _display_add_command(d_descr, INTENSITY_REG, 1, &data_pos);
         _display_add_command(d_descr, SCAN_LIMIT_REG, 7, &data_pos);
@@ -95,18 +97,19 @@ void display_set_intensity(uint8_t intensity)
 
     if (d_descr)
     {
+        d_descr->part_len = CONTINUOUS_DATA_LEN;
         for (uint8_t i = 0; i < MATRIX_QTY; i++)
         {
             _display_add_command(d_descr, INTENSITY_REG, intensity, &data_pos);
         }
 
-        for(uint8_t i = 0; i < BYTES_PER_MATRIX; i++)
-        {
-            for(int8_t j = 3; j >= 0; j--)
-            {
-                display_add_digit(d_descr, i + 1,(uint8_t)((_display_buffer[i] >> 8 * j) & 0x000000ffUL), &data_pos);
-            }
-        }
+//        for(uint8_t i = 0; i < BYTES_PER_MATRIX; i++)
+//        {
+//            for(int8_t j = MATRIX_QTY - 1; j >= 0; j--)
+//            {
+//                display_add_digit(d_descr, i + 1,(uint8_t)((_display_buffer[i] >> 8 * j) & 0x000000ffUL), &data_pos);
+//            }
+//        }
         d_spi_send();
     }
 }
@@ -118,6 +121,7 @@ void display_show(void)
 
     if (d_descr)
     {
+        d_descr->part_len = MATRIX_QTY * COMMAND_LEN;
         for(uint8_t i = 0; i < MATRIX_HEIGHT; i++)
         {
             for(int8_t j = 3; j >= 0; j--)
@@ -132,14 +136,14 @@ void display_show(void)
 void display_task(void * parameter)
 {
     display_init();
-    _display_buffer[0] = 0xffff01ff;
-    _display_buffer[1] = 0x7f7f017f;
-    _display_buffer[2] = 0x3f3f013f;
-    _display_buffer[3] = 0x1f1f011f;
-    _display_buffer[4] = 0x0f0f010f;
-    _display_buffer[5] = 0x07070107;
-    _display_buffer[6] = 0x03030103;
-    _display_buffer[7] = 0x01010101;
+    _display_buffer[0] = 0x010101ff;
+    _display_buffer[1] = 0x0303017f;
+    _display_buffer[2] = 0x0707013f;
+    _display_buffer[3] = 0x0f0f011f;
+    _display_buffer[4] = 0x0f1f010f;
+    _display_buffer[5] = 0x073f0107;
+    _display_buffer[6] = 0x037f0103;
+    _display_buffer[7] = 0x01ff0101;
     while (1)
     {
         osDelay(1000);
